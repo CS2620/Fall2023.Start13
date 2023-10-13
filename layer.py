@@ -29,29 +29,10 @@ class Layer:
     def generate_histogram(self):
         layer = Layer(256, 100, 0, 0)
 
-        histogram = [0] * 256
-        
-        #Generate the histogram
-        for y in range(self.height):
-            for x in range(self.width):
-                pixel = self.get_pixel(x,y)
-                grayscale = math.floor((pixel[0] + pixel[1] + pixel[2])/3)
-                histogram[grayscale] += 1
-
-
-
-        max = 0
-        for h in histogram:
-            if h > max:
-                max = h
-
-        # Now normalize the histogram
+        histogram = self.histogram_array()
         histogram_max = 100
-        for i in range(256):
-            h = histogram[i]
-            h /= max
-            h *= histogram_max
-            histogram[i] = h
+        for i in range(len(histogram)):
+            histogram[i] *= histogram_max
 
         # Draw the histogram
         for i in range(256):
@@ -114,8 +95,8 @@ class Layer:
 
         return layer
 
-    def brighten(self, amount):
-
+    def histogram_array(self):
+        
         histogram = [0] * 256
         
         #Generate the histogram
@@ -124,6 +105,7 @@ class Layer:
                 pixel = self.get_pixel(x,y)
                 grayscale = math.floor((pixel[0] + pixel[1] + pixel[2])/3)
                 histogram[grayscale] += 1
+
         max = 0
         for h in histogram:
             if h > max:
@@ -135,27 +117,29 @@ class Layer:
             h /= max
             histogram[i] = h
 
-        sum = 0
-        i = 0
-        while sum < .5:
-            sum += histogram[i]
-            i+=1
-            # break
+        return histogram
 
-        print(i)
-
-        
-
-
+    def brighten(self, amount):
         for y in range(self.height):
             for x in range(self.width):
                 pixel = self.get_pixel(x,y)
-                grayscale = math.floor((pixel[0] + pixel[1] + pixel[2])/3)
                 new_pixel = (pixel[0] + amount, pixel[1] + amount, pixel[2] + amount)
                 self.set_pixel(x,y, new_pixel)
 
     def add_contrast(self, amount):
-        pass
+        for y in range(self.height):
+            for x in range(self.width):
+                pixel = self.get_pixel(x, y)
+                grayscale = (pixel[0] + pixel[1] + pixel[2])/3
+                offset = grayscale - 128
+                offset *= amount
+                offset += 128
+                offset = math.floor(offset - grayscale)
+
+                new_pixel = (pixel[0] + offset, pixel[1] +
+                             offset, pixel[2] + offset)
+
+                self.set_pixel(x, y, new_pixel)
 
     def auto_tune_brightness(self):
         pass
@@ -165,6 +149,15 @@ class Layer:
 
     def auto_tune_contrast(self):
         pass
+
+    def make_grayscale(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                pixel = self.get_pixel(x,y)
+                grayscale = math.floor((pixel[0] + pixel[1] + pixel[2])/3)
+                new_pixel = (grayscale, grayscale, grayscale)
+                self.set_pixel(x,y, new_pixel)
+        return self
 
     def set_pixel(self, x, y, color) -> None:
         """Set a pixel in the layer buffer"""

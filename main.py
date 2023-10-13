@@ -14,9 +14,13 @@ def main():
 
     dir = "./images/"
     files = os.listdir(dir)
+    stop = 0
+    count = 0
     for file in files:
         container = get_layers_in_a_row(2, dir + file)
-        container.layers[1].brighten(-100)
+        # container.layers[1].brighten(-100)
+        # container.layers[1].add_contrast(1.5)
+        container.layers[1].auto_tune_brightness()
         container.add_layer(container.layers[0].generate_histogram())
         container.add_layer(container.layers[1].generate_histogram(), container.layers[0].width, 0)
         container.pack()
@@ -24,6 +28,9 @@ def main():
         # Finally, save the image
         print("Done with " + file)
         container.save("done_" + file + ".png")
+        count += 1
+        if count > stop:
+          break
         
 
 def get_layers_in_a_row(count, filename):

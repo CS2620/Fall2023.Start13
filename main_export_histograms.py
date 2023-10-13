@@ -15,16 +15,22 @@ def main():
     dir = "./images/"
     files = os.listdir(dir)
     files.sort()
+    stop = 10000
+    count = 0
     for file in files:
         container = get_layers_in_a_row(1, dir + file)
         container.add_layer(container.layers[0].generate_histogram())
         container.remove_layer_index(0)
+        # container.layers[0].make_grayscale()
         container.pack()
 
         # Finally, save the image
         print("Done with " + file)
-        container.save("histogram_" + file + ".png")
-        # break
+        container.save("./histogrammed/histogram_" + file + ".png")
+        # container.save("./histogrammed/grayscale_" + file + ".png")
+        count += 1
+        if count > stop:
+          break
         
 
 def get_layers_in_a_row(count, filename):
