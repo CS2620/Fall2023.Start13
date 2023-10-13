@@ -16,6 +16,10 @@ class Container:
         self.buffer = self.image.load()
         self.layers = []
 
+    def remove_layer_index(self, index: int):
+        del self.layers[index]
+        return self
+
     def add_layer(self, layer: Layer, offset_x=0, offset_y=0):
         """Add a layer to the container
 
