@@ -9,7 +9,16 @@ import numpy as np
 import os
 
 
-def main():
+
+def one():
+    file = "_off_butterfly.jpg"
+    container = get_layer_from_file("./images/" + file)
+    container.add_layer(container.layers[0].generate_histogram())
+    container.pack()
+    container.save("done_" + file + ".png")
+
+
+def many():
     print("Start")
 
     dir = "./images/"
@@ -20,7 +29,8 @@ def main():
         container = get_layers_in_a_row(2, dir + file)
         # container.layers[1].brighten(-100)
         # container.layers[1].add_contrast(1.5)
-        container.layers[1].auto_tune_brightness()
+        # container.layers[1].auto_tune_brightness()
+        container.layers[1].gamma_encode(2.5*.5)
         container.add_layer(container.layers[0].generate_histogram())
         container.add_layer(container.layers[1].generate_histogram(), container.layers[0].width, 0)
         container.pack()
@@ -32,6 +42,20 @@ def main():
         if count > stop:
           break
         
+def get_layer_from_file(filename):
+    image = Image.open(filename)
+    """ Load the image and get its height and width"""
+    width = image.size[0]
+    height = image.size[1]
+
+    """ Building a container for the image"""
+    container: Container = Container(width, height)
+    
+    layer: Layer = Layer(width, height, 0, 0)
+    layer.pixels = list(image.getdata())
+    container.add_layer(layer)
+    
+    return container
 
 def get_layers_in_a_row(count, filename):
     if count <= 0:
@@ -55,10 +79,11 @@ def get_layers_in_a_row(count, filename):
     
     return container
 
+start = time.time()
+one()
+end = time.time()
+print(str(end - start) + " " + " seconds")
     
 
 
-start = time.time()
-main()
-end = time.time()
-print(str(end - start) + " " + " seconds")
+

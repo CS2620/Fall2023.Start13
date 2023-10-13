@@ -141,8 +141,36 @@ class Layer:
 
                 self.set_pixel(x, y, new_pixel)
 
+    def gamma_encode(self, amount):
+        for y in range(self.height):
+            for x in range(self.width):
+                pixel = self.get_pixel(x,y)
+                grayscale = math.floor((pixel[0] + pixel[1] + pixel[2])/3)
+                normalized_grayscale = grayscale/256
+                gamma = math.pow(normalized_grayscale, amount)
+                gamma_grayscale = gamma * 256
+                move = math.floor(gamma_grayscale - grayscale)
+                new_pixel = (pixel[0] + move, pixel[1] + move, pixel[2] + move)
+                self.set_pixel(x,y, new_pixel)
+
     def auto_tune_brightness(self):
-        pass
+        sum = 0
+        for y in range(self.height):
+            for x in range(self.width):
+                pixel = self.get_pixel(x, y)
+                grayscale = (pixel[0] + pixel[1] + pixel[2])/3
+                sum += grayscale - 128
+        average_offset = -math.floor(sum // (self.height * self.width))
+                
+        for y in range(self.height):
+            for x in range(self.width):
+                pixel = self.get_pixel(x, y)
+                grayscale = math.floor((pixel[0] + pixel[1] + pixel[2])/3)
+                
+                new_pixel = (pixel[0] + average_offset, pixel[1] +
+                             average_offset, pixel[2] + average_offset)
+
+                self.set_pixel(x, y, new_pixel)
 
     def auto_tune_everything(self):
         pass
