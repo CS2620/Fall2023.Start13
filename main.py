@@ -10,10 +10,27 @@ import os
 
 
 
+
 def one():
-    file = "_off_butterfly.jpg"
+    file = "beaches.jpg"
     container = get_layer_from_file("./images/" + file)
-    container.add_layer(container.layers[0].generate_histogram())
+    width = container.layers[0].width
+    height = container.layers[0].height
+    # container.add_layer(container.layers[0].generate_histogram())
+    container.add_layer(container.layers[0].duplicate(), width, 0)
+    container.add_layer(container.layers[0].duplicate(), width*2, 0)
+    container.add_layer(container.layers[0].duplicate(), 0, height)
+    container.add_layer(container.layers[0].duplicate(), width, height)
+    container.add_layer(container.layers[0].duplicate(), width*2, height)
+
+    container.layers[0].to_red_channel()
+    container.layers[1].to_green_channel()
+    container.layers[2].to_blue_channel()
+
+    container.layers[3].to_hue_channel()
+    container.layers[4].to_saturation_channel()
+    container.layers[5].to_value_channel()
+
     container.pack()
     container.save("done_" + file + ".png")
 
